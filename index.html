@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>二月季 · 校园闲置流转平台</title>
+<meta name="description" content="二月季——只对本校学生开放的校园二手物品流转平台。教材、宿舍用品、数码、自行车，下楼就能成交。">
+<meta name="theme-color" content="#1e6fd9">
+</head>
+<body style="margin:0;padding:0;background:#f5f9fd;color:#16233a;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif;font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased;">
+
+<!-- ============ 顶部导航 ============ -->
+<header style="position:sticky;top:0;z-index:50;background:rgba(255,255,255 .88);backdrop-filter:blur(14px);border-bottom:1px solid #e3eefb;">
+  <div style="max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+
+    <a href="#" style="display:flex;align-items:center;gap:9px;text-decoration:none;color:#0d2b52;flex-shrink:0;">
+      <span style="width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#3b8ef0,#1e6fd9);display:grid;place-items:center;font-size:18px;box-shadow:0 4px 12px rgba(30,111,217 .28);">🐋</span>
+      <span style="display:flex;flex-direction:column;line-height:1.15;">
+        <strong style="font-size:16px;letter-spacing:.5px;">二月季</strong>
+        <span style="font-size:10px;color:#7d90a8;letter-spacing:1.4px;">CAMPUS&nbsp;RESALE</span>
+      </span>
+    </a>
+
+    <div style="flex:1;min-width:180px;display:flex;align-items:center;gap:8px;background:#eef5fd;border:1px solid #dbe9fa;border-radius:11px;padding:8px 12px;">
+      <span style="font-size:14px;color:#8ba6c4;">🔍</span>
+      <input id="q" type="text" placeholder="搜教材、搜型号、搜课程名…" oninput="setFilter('q',this.value)"
+        style="flex:1;border:none;outline:none;background:transparent;font-size:14px;color:#16233a;font-family:inherit;min-width:0;">
+      <span id="qClear" onclick="document.getElementById('q').value='';setFilter('q','')"
+        style="display:none;cursor:pointer;color:#9fb4cc;font-size:16px;line-height:1;">×</span>
+    </div>
+
+    <button onclick="openPublish()"
+      style="border:none;cursor:pointer;background:linear-gradient(135deg,#2f83ee,#1a63cc);color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:10px 18px;border-radius:11px;box-shadow:0 4px 14px rgba(26,99,204 .3);"
+      onmouseover="this.style.boxShadow='0 6px 20px rgba(26,99,204 .42)';this.style.transform='translateY(-1px)'"
+      onmouseout="this.style.boxShadow='0 4px 14px rgba(26,99,204 .3)';this.style.transform='none'">
+      ＋ 发布闲置
+    </button>
+  </div>
+</header>
+
+<!-- ============ Hero ============ -->
+<section style="max-width:1180px;margin:0 auto;padding:34px 20px 10px;">
+  <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;">
+    <div style="flex:1;min-width:280px;">
+      <div style="display:inline-block;background:#e7f2ff;color:#1a63cc;font-size:12px;font-weight:600;padding:4px 11px;border-radius:20px;letter-spacing:.4px;margin-bottom:12px;">
+        本校实名 · 仅限在校生 · 下楼就能成交
+      </div>
+      <h1 style="margin:0 0 10px;font-size:clamp(26px,4vw,38px);line-height:1.25;font-weight:800;color:#0d2b52;letter-spacing:-.5px;">
+        宿舍楼下，<span style="color:#1e6fd9;">把闲置换成钱</span>
+      </h1>
+      <p style="margin:0;color:#5c7291;font-size:15px;max-width:520px;">
+        教材、宿舍用品、自行车、数码配件——不邮寄、不议价扯皮。同一个园区，当面验货，走两分钟就拿到手。
+      </p>
+    </div>
+
+    <div style="display:flex;gap:9px;flex-wrap:wrap;width:100%;max-width:340px;">
+      <div style="flex:1 1 0;min-width:0;box-sizing:border-box;background:#fff;border:1px solid #e3eefb;border-radius:14px;padding:13px 6px;text-align:center;box-shadow:0 2px 10px rgba(20,60,120 .05);">
+        <div id="statOn" style="font-size:22px;font-weight:800;color:#1e6fd9;line-height:1.2;">0</div>
+        <div style="font-size:11.5px;color:#8497ad;margin-top:2px;white-space:nowrap;">件在售</div>
+      </div>
+      <div style="flex:1 1 0;min-width:0;box-sizing:border-box;background:#fff;border:1px solid #e3eefb;border-radius:14px;padding:13px 6px;text-align:center;box-shadow:0 2px 10px rgba(20,60,120 .05);">
+        <div id="statSaved" style="font-size:22px;font-weight:800;color:#f0854a;line-height:1.2;">0</div>
+        <div style="font-size:11.5px;color:#8497ad;margin-top:2px;white-space:nowrap;">我想要的</div>
+      </div>
+      <div style="flex:1 1 0;min-width:0;box-sizing:border-box;background:#fff;border:1px solid #e3eefb;border-radius:14px;padding:13px 6px;text-align:center;box-shadow:0 2px 10px rgba(20,60,120 .05);">
+        <div id="statCarbon" style="font-size:22px;font-weight:800;color:#37a06a;line-height:1.2;">0</div>
+        <div style="font-size:11.5px;color:#8497ad;margin-top:2px;white-space:nowrap;">kg 减碳</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Tab ============ -->
+<div style="max-width:1180px;margin:22px auto 0;padding:0 20px;">
+  <div style="display:flex;gap:6px;border-bottom:2px solid #e6f0fb;padding-bottom:0;">
+    <button id="tab-sell" onclick="setTab('sell')" style="border:none;background:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:600;padding:10px 16px 12px;color:#1e6fd9;border-bottom:3px solid #1e6fd9;margin-bottom:-2px;">在售闲置</button>
+    <button id="tab-want" onclick="setTab('want')" style="border:none;background:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:600;padding:10px 16px 12px;color:#8497ad;border-bottom:3px solid transparent;margin-bottom:-2px;">求购专区</button>
+    <button id="tab-mine" onclick="setTab('mine')" style="border:none;background:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:600;padding:10px 16px 12px;color:#8497ad;border-bottom:3px solid transparent;margin-bottom:-2px;">我的发布</button>
+  </div>
+</div>
+
+<!-- ============ 筛选栏 ============ -->
+<div id="filterBar" style="max-width:1180px;margin:0 auto;padding:16px 20px 6px;">
+  <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+    <span style="font-size:12px;color:#94a7bd;margin-right:2px;">品类</span>
+    <div id="catChips" style="display:flex;gap:7px;flex-wrap:wrap;"></div>
+  </div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
+    <span style="font-size:12px;color:#94a7bd;margin-right:2px;">成色</span>
+    <div id="condChips" style="display:flex;gap:7px;flex-wrap:wrap;"></div>
+    <span style="flex:1;"></span>
+    <span style="font-size:12px;color:#94a7bd;">排序</span>
+    <select id="sort" onchange="setFilter('sort',this.value)"
+      style="font-family:inherit;font-size:13px;color:#16233a;background:#fff;border:1px solid #dbe9fa;border-radius:9px;padding:6px 10px;outline:none;cursor:pointer;">
+      <option value="new">最新发布</option>
+      <option value="near">离我最近</option>
+      <option value="priceAsc">价格从低到高</option>
+      <option value="priceDesc">价格从高到低</option>
+      <option value="cond">成色优先</option>
+    </select>
+  </div>
+</div>
+
+<!-- ============ 商品网格 ============ -->
+<main style="max-width:1180px;margin:0 auto;padding:14px 20px 60px;">
+  <div id="resultLine" style="font-size:13px;color:#8ba0b8;margin-bottom:12px;"></div>
+  <div id="grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:16px;"></div>
+  <div id="empty" style="display:none;text-align:center;padding:70px 20px;color:#94a7bd;">
+    <div style="font-size:44px;margin-bottom:12px;">🐋</div>
+    <div style="font-size:15px;font-weight:600;color:#5c7291;margin-bottom:6px;">这里空空的</div>
+    <div style="font-size:13px;">换个关键词，或者自己发一条</div>
+  </div>
+</main>
+
+<!-- ============ 页脚 ============ -->
+<footer style="background:#0d2b52;color:#a9c2dd;margin-top:20px;">
+  <div style="max-width:1180px;margin:0 auto;padding:38px 20px 26px;display:flex;gap:34px;flex-wrap:wrap;">
+    <div style="flex:1.4;min-width:240px;">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
+        <span style="width:30px;height:30px;border-radius:9px;background:rgba(255,255,255 .1);display:grid;place-items:center;font-size:15px;">🐋</span>
+        <strong style="color:#fff;font-size:15px;">二月季</strong>
+        <span style="font-size:11px;color:#6d8db3;">信息2410 · 校园创新创业项目</span>
+      </div>
+      <p style="margin:0;font-size:13px;line-height:1.75;color:#7f9dbc;">
+        把「可信身份、当面验货、就近自提、有人负责」四个环节串起来的校内履约体系。<br>
+        不做全国市场的又一个信息集市，只做本校学生下楼就能成交的二手服务。
+      </p>
+    </div>
+    <div style="flex:1;min-width:160px;font-size:13px;line-height:2;">
+      <div style="color:#fff;font-weight:600;margin-bottom:6px;">四条主线</div>
+      <div>毕业季清仓收储</div>
+      <div>新生入学装备站</div>
+      <div>学期中刚需流转</div>
+      <div>闲置公益捐赠</div>
+    </div>
+    <div style="flex:1;min-width:190px;font-size:13px;line-height:2;">
+      <div style="color:#fff;font-weight:600;margin-bottom:6px;">说明</div>
+      <div>纯静态页面，无数据库</div>
+      <div>数据存在本机浏览器</div>
+      <div>成色五档：全新 / 九五新 / 九成新 / 七成新 / 可用</div>
+    </div>
+  </div>
+  <div style="border-top:1px solid rgba(255,255,255 .08);padding:14px 20px;text-align:center;font-size:12px;color:#5f7fa6;">
+    二月季 · 校园闲置流转平台 — 演示站点，商品与用户信息均为示例数据
+  </div>
+</footer>
+
+<!-- ============ 商品详情弹窗 ============ -->
+<div id="modal" onclick="if(event.target===this)closeModal()"
+  style="display:none;position:fixed;inset:0;z-index:200;background:rgba(10,30,55 .5);backdrop-filter:blur(3px);padding:20px;overflow:auto;">
+  <div id="modalBox" style="max-width:560px;margin:40px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 24px 60px rgba(6,25,50 .35);"></div>
+</div>
+
+<!-- ============ 发布弹窗 ============ -->
+<div id="pubModal" onclick="if(event.target===this)closePublish()"
+  style="display:none;position:fixed;inset:0;z-index:210;background:rgba(10,30,55 .5);backdrop-filter:blur(3px);padding:20px;overflow:auto;">
+  <div style="max-width:520px;margin:30px auto;background:#fff;border-radius:18px;box-shadow:0 24px 60px rgba(6,25,50 .35);overflow:hidden;">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #eef4fb;">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#0d2b52;">发布一条闲置</div>
+        <div style="font-size:12px;color:#8ba0b8;margin-top:2px;">规范填写能少一半的扯皮</div>
+      </div>
+      <button onclick="closePublish()" style="border:none;background:#f0f5fb;color:#7d90a8;width:30px;height:30px;border-radius:9px;cursor:pointer;font-size:16px;line-height:1;font-family:inherit;">×</button>
+    </div>
+
+    <div style="padding:18px 22px 4px;">
+      <label style="display:block;font-size:12px;font-weight:600;color:#5c7291;margin-bottom:5px;">标题 <span style="color:#e2683c;">*</span></label>
+      <input id="pTitle" type="text" maxlength="40" placeholder="例：《高等数学》同济第七版 上下册 + 习题册"
+        style="width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;color:#16233a;background:#f7fafd;border:1px solid #dbe9fa;border-radius:10px;padding:10px 12px;outline:none;margin-bottom:14px;">
+
+      <div style="display:flex;gap:12px;margin-bottom:14px;">
+        <div style="flex:1;">
+          <label style="display:block;font-size:12px;font-weight:600;color:#5c7291;margin-bottom:5px;">品类</label>
+          <select id="pCat" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;color:#16233a;background:#f7fafd;border:1px solid #dbe9fa;border-radius:10px;padding:10px 12px;outline:none;cursor:pointer;"></select>
+        </div>
+        <div style="flex:1;">
+          <label style="display:block;font-size:12px;font-weight:600;color:#5c7291;margin-bottom:5px;">成色</label>
+          <select id="pCond" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;color:#16233a;background:#f7fafd;border:1px solid #dbe9fa;border-radius:10px;padding:10px 12px;outline:none;cursor:pointer;"></select>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-bottom:14px;">
+        <div style="flex:1;">
+          <label style="display:block;font-size:12px;font-weight:600;color:#5c7291;margin-bottom:5px;">售价（元）<span style="color:#e2683c;">*</span></label>
+          <input id="pPrice" type="number" min="0" max="99999" placeholder="25"
+            style="width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;color:#16233a;background:#f7fafd;border:1px solid #dbe9fa;border-radius:10px;padding:10px 12px;outline:none;">
+        </div>
+        <div style="flex:1;">
+          <label style="display:block;font-size:12px;font-weight:600;color:#5c7291;margin-bottom:5px;">原价（元，选填）</label>
+          <input id="pOrig" type="number" min="0" max="99999" placeholder="89"
+            style="width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;color:#16233a;background:#f7fafd;border:1px solid #dbe9fa;border-radius:10px;padding:10px 12px;outline:none;">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-bottom:14px;">
+        <div style="flex:1;">
+          <label style="display:block;font-size:12px;font-weight:600;color:#5c7291;margin-bottom:5px;">自提地点</label>
+          <select id="pLoc" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;color:#16233a;background:#f7fafd;border:1px solid #dbe9fa;border-radius:10px;padding:10px 12px;outline:none;cursor:pointer;"></select>
+        </div>
+        <div style="flex:1;">
+          <label style="display:block;font-size:12px;font-weight:600;color:#5c7291;margin-bottom:5px;">院系</label>
+          <input id="pDept" type="text" maxlength="12" placeholder="信息2410"
+            style="width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;color:#16233a;background:#f7fafd;border:1px solid #dbe9fa;border-radius:10px;padding:10px 12px;outline:none;">
+        </div>
+      </div>
+
+      <label style="display:block;font-size:12px;font-weight:600;color:#5c7291;margin-bottom:5px;">描述与瑕疵说明</label>
+      <textarea id="pDesc" rows="3" maxlength="200" placeholder="例：有少量笔记，封面有折痕，内页完整不缺页。"
+        style="width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;color:#16233a;background:#f7fafd;border:1px solid #dbe9fa;border-radius:10px;padding:10px 12px;outline:none;resize:vertical;margin-bottom:8px;"></textarea>
+      <div style="font-size:11.5px;color:#a3b4c8;margin-bottom:16px;">瑕疵写清楚，成交快一半。本站不背书任何交易，请当面验货。</div>
+    </div>
+
+    <div style="display:flex;gap:10px;padding:0 22px 20px;">
+      <button onclick="closePublish()" style="flex:1;border:1px solid #dbe9fa;background:#fff;color:#5c7291;font-family:inherit;font-size:14px;font-weight:600;padding:11px;border-radius:11px;cursor:pointer;">取消</button>
+      <button onclick="submitPublish()" style="flex:2;border:none;background:linear-gradient(135deg,#2f83ee,#1a63cc);color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:11px;border-radius:11px;cursor:pointer;box-shadow:0 4px 14px rgba(26,99,204 .3);">确认发布</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Toast ============ -->
+<div id="toast" style="position:fixed;left:50%;bottom:34px;transform:translate(-50%,20px);z-index:300;background:#0d2b52;color:#fff;font-size:13.5px;padding:11px 20px;border-radius:11px;box-shadow:0 10px 30px rgba(6,25,50 .35);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap;"></div>
+
+<script>
+/* =========================================================
+   二月季 · 校园闲置流转平台
+   纯静态页面：数据全部存在浏览器 localStorage，无后端无数据库
+   ========================================================= */
+
+var CATS = ["教材教辅","考证资料","宿舍用品","数码电子","自行车/交通","运动器材","服饰鞋包","乐器/兴趣"];
+var CONDS = ["全新","九五新","九成新","七成新","可用"];
+var LOCS  = ["1号楼","2号楼","3号楼","4号楼","5号楼","图书馆","食堂门口","活动中心"];
+var EMOJI = {"教材教辅":"📚","考证资料":"📝","宿舍用品":"🛏️","数码电子":"💻","自行车/交通":"🚲","运动器材":"🏸","服饰鞋包":"👟","乐器/兴趣":"🎸"};
+var CATCOLOR = {"教材教辅":["#eaf2ff","#d6e6ff"],"考证资料":["#fff2e6","#ffe3cc"],"宿舍用品":["#eafaf1","#d5f2e3"],"数码电子":["#eaf4ff","#d4e8ff"],"自行车/交通":["#f0ecff","#e0d9ff"],"运动器材":["#e9f9f8","#d0f0ee"],"服饰鞋包":["#fdeef4","#fbdce8"],"乐器/兴趣":["#fff8e6","#ffeec4"]};
+
+var KEY = "eryueji_items_v1";
+var SKEY = "eryueji_saved_v1";
+
+/* ---------- 种子数据 ---------- */
+var SEED = [
+  {id:"s1",title:"《高等数学》同济第七版 上下册 + 习题册",cat:"教材教辅",cond:"九成新",price:25,orig:89,desc:"只用了大一上学期，有少量铅笔笔记已经擦掉，内页完整不缺页，封面有一道折痕。三本一起出。",loc:"3号楼",dept:"信息2410",seller:"叶同学",credit:4.9,trade:12,seedWeight:1.4},
+  {id:"s2",title:"考研英语真题全套 2007—2024",cat:"考证资料",cond:"全新",price:30,orig:96,desc:"买重复了，塑封都没拆。含答案解析册和两本词汇书，一起走。",loc:"图书馆",dept:"外院2301",seller:"孟同学",credit:5.0,trade:8,seedWeight:0.9},
+  {id:"s3",title:"宿舍小台灯 三档调光 可充电",cat:"宿舍用品",cond:"九五新",price:15,orig:49,desc:"USB 充电款，带笔筒底座。用了半个学期，灯珠没坏，电池还挺得住三晚。",loc:"1号楼",dept:"机械2402",seller:"付同学",credit:4.7,trade:5,seedWeight:0.5},
+  {id:"s4",title:"山地自行车 24 速 送锁",cat:"自行车/交通",cond:"七成新",price:180,orig:760,desc:"骑了两年，链条新换过，刹车灵敏。车架有正常掉漆，坐垫边缘磨破一小块。带 U 形锁。",loc:"2号楼",dept:"土木2301",seller:"杨同学",credit:4.8,trade:3,seedWeight:13},
+  {id:"s5",title:"罗技 G304 无线鼠标 附电池",cat:"数码电子",cond:"九成新",price:95,orig:239,desc:"换了一套外设所以出。左键正常，滚轮无跳，接收器在，附一颗新电池。",loc:"4号楼",dept:"信息2409",seller:"石同学",credit:4.9,trade:21,seedWeight:0.1},
+  {id:"s6",title:"尤克里里 23 寸 送琴包和拨片",cat:"乐器/兴趣",cond:"九五新",price:120,orig:328,desc:"学了一学期就放着落灰。音准没问题，弦是新换的，琴包、拨片、变调夹一起给。",loc:"活动中心",dept:"艺设2301",seller:"吴同学",credit:4.6,trade:2,seedWeight:0.8},
+  {id:"s7",title:"羽毛球拍一对 + 三个球",cat:"运动器材",cond:"七成新",price:60,orig:198,desc:"碳素拍，握把胶刚换。网线有一处轻微松，不影响打。球是训练球。",loc:"食堂门口",dept:"体育2302",seller:"韦同学",credit:4.5,trade:4,seedWeight:0.6},
+  {id:"s8",title:"收纳箱 60L 两个 带滑轮",cat:"宿舍用品",cond:"九成新",price:20,orig:118,desc:"毕业清仓，只搬过两次。盖子卡扣完整，两个一起出，不拆。",loc:"5号楼",dept:"会院2001",seller:"张同学",credit:5.0,trade:9,seedWeight:3.2},
+  {id:"s9",title:"iPad 第 9 代 64G WiFi 版",cat:"数码电子",cond:"九成新",price:1200,orig:2499,desc:"贴膜带壳用，屏幕无划痕，电池健康度 91%。送保护壳和一支电容笔。当面验机。",loc:"3号楼",dept:"信息2410",seller:"叶同学",credit:4.9,trade:12,seedWeight:0.46},
+  {id:"s10",title:"四六级真题 + 高频词汇书",cat:"考证资料",cond:"全新",price:18,orig:58,desc:"多买的一套，没写过。真题 12 套完整，词汇书按频率排序。",loc:"图书馆",dept:"外院2302",seller:"孟同学",credit:5.0,trade:8,seedWeight:0.75},
+  {id:"s11",title:"宿舍折叠小书桌 床上用",cat:"宿舍用品",cond:"七成新",price:22,orig:79,desc:"桌面有圆珠笔划痕，能立起来当靠背。承重没问题，放笔记本稳。",loc:"2号楼",dept:"机械2402",seller:"付同学",credit:4.7,trade:5,seedWeight:2.1},
+  {id:"s12",title:"瑜伽垫 加厚 10mm 附收纳带",cat:"运动器材",cond:"九五新",price:28,orig:99,desc:"练了不到十次，无破损无污渍。收纳带和背袋都在。",loc:"4号楼",dept:"护理2301",seller:"石同学",credit:4.9,trade:21,seedWeight:1.1}
+];
+
+var WANTS = [
+  {id:"w1",title:"求购《数据结构》严蔚敏 C 语言版",cat:"教材教辅",budget:20,desc:"要含习题册，有笔记也行，急用，本周内可自提。",loc:"3号楼",dept:"信息2410",seller:"叶同学",credit:4.9,trade:12},
+  {id:"w2",title:"求购床上用品四件套（0.9m 床）",cat:"宿舍用品",budget:50,desc:"要洗干净的，深色优先。新生入住用，能当面看。",loc:"1号楼",dept:"机械2402",seller:"付同学",credit:4.7,trade:5},
+  {id:"w3",title:"求购 24 寸二手显示器",cat:"数码电子",budget:300,desc:"1080p 就行，接口 HDMI 优先，能通电验屏再谈价钱。",loc:"5号楼",dept:"信息2409",seller:"石同学",credit:4.9,trade:21}
+];
+
+/* ---------- 状态 ---------- */
+var state = {
+  tab: "sell",
+  filter: {cat:"", cond:"", q:"", sort:"new"},
+  items: [],
+  saved: []
+};
+
+function loadAll(){
+  var raw = null;
+  try { raw = localStorage.getItem(KEY); } catch(e){}
+  if (raw) {
+    try {
+      var arr = JSON.parse(raw);
+      if (Array.isArray(arr) && arr.length) state.items = arr;
+      else state.items = SEED.slice();
+    } catch(e){ state.items = SEED.slice(); }
+  } else {
+    state.items = SEED.slice();
+  }
+  // 补齐时间与距离：种子数据没有 ts，否则全部显示「刚刚」，假得离谱
+  var now = Date.now();
+  for (var i = 0; i < state.items.length; i++) {
+    var it = state.items[i];
+    if (!it.ts) it.ts = now - (i * 5 + 3) * 36 * 60000;
+    if (it.locDist == null) it.locDist = locDist(it.loc);
+  }
+  saveAll();
+
+  var s = null;
+  try { s = localStorage.getItem(SKEY); } catch(e){}
+  if (s) { try { state.saved = JSON.parse(s) || []; } catch(e){ state.saved = []; } }
+  if (!Array.isArray(state.saved)) state.saved = [];
+}
+
+function locDist(loc){
+  var i = LOCS.indexOf(loc);
+  return i < 0 ? 99 : i;
+}
+
+function saveAll(){
+  try { localStorage.setItem(KEY, JSON.stringify(state.items)); } catch(e){}
+}
+function saveSaved(){
+  try { localStorage.setItem(SKEY, JSON.stringify(state.saved)); } catch(e){}
+}
+
+/* ---------- 工具 ---------- */
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function money(n){ return "¥" + (Number(n) || 0); }
+function timeAgo(ts){
+  if (!ts) return "刚刚";
+  var d = Date.now() - ts;
+  if (d < 60000) return "刚刚";
+  if (d < 3600000) return Math.floor(d/60000) + " 分钟前";
+  if (d < 86400000) return Math.floor(d/3600000) + " 小时前";
+  return Math.floor(d/86400000) + " 天前";
+}
+function condScore(c){ var i = CONDS.indexOf(c); return i < 0 ? 0 : (CONDS.length - i); }
+function toast(msg){
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.opacity = "1";
+  t.style.transform = "translate(-50%,0)";
+  clearTimeout(window.__tt);
+  window.__tt = setTimeout(function(){
+    t.style.opacity = "0";
+    t.style.transform = "translate(-50%,20px)";
+  }, 2000);
+}
+
+/* ---------- 筛选控件 ---------- */
+function renderChips(){
+  var cc = document.getElementById("catChips");
+  var html = chipHtml("", "全部", state.filter.cat === "");
+  for (var i=0;i<CATS.length;i++){
+    html += chipHtml(CATS[i], EMOJI[CATS[i]] + " " + CATS[i], state.filter.cat === CATS[i]);
+  }
+  cc.innerHTML = html;
+
+  var dc = document.getElementById("condChips");
+  var h2 = chipHtml("", "不限", state.filter.cond === "");
+  for (var j=0;j<CONDS.length;j++) h2 += chipHtml(CONDS[j], CONDS[j], state.filter.cond === CONDS[j]);
+  dc.innerHTML = h2;
+}
+
+function chipHtml(val, label, active){
+  var bg = active ? "#1e6fd9" : "#fff";
+  var fg = active ? "#fff" : "#5c7291";
+  var bd = active ? "#1e6fd9" : "#dbe9fa";
+  var sh = active ? "box-shadow:0 3px 10px rgba(30,111,217 .25);" : "";
+  return '<button onclick="pickChip(\'' + esc(val).replace(/'/g,"") + '\')" ' +
+    'style="border:1px solid ' + bd + ';background:' + bg + ';color:' + fg + ';font-family:inherit;font-size:12.5px;' +
+    'padding:6px 12px;border-radius:20px;cursor:pointer;white-space:nowrap;' + sh + '">' + esc(label) + '</button>';
+}
+
+function pickChip(val){
+  if (CATS.indexOf(val) >= 0) {
+    state.filter.cat = (state.filter.cat === val) ? "" : val;
+  } else {
+    state.filter.cond = (state.filter.cond === val) ? "" : val;
+  }
+  renderChips();
+  render();
+}
+
+function setFilter(k, v){
+  state.filter[k] = v;
+  if (k === "q") {
+    document.getElementById("qClear").style.display = v ? "inline" : "none";
+  }
+  render();
+}
+
+function setTab(t){
+  state.tab = t;
+  ["sell","want","mine"].forEach(function(k){
+    var b = document.getElementById("tab-" + k);
+    if (!b) return;
+    var on = (k === t);
+    b.style.color = on ? "#1e6fd9" : "#8497ad";
+    b.style.borderBottom = "3px solid " + (on ? "#1e6fd9" : "transparent");
+  });
+  render();
+}
+
+/* ---------- 筛选逻辑 ---------- */
+function visibleItems(){
+  var f = state.filter;
+  var arr = state.items.slice();
+
+  if (f.cat) arr = arr.filter(function(x){ return x.cat === f.cat; });
+  if (f.cond) arr = arr.filter(function(x){ return x.cond === f.cond; });
+  if (f.q) {
+    var q = f.q.toLowerCase().trim();
+    arr = arr.filter(function(x){
+      return (x.title + " " + x.desc + " " + x.cat + " " + (x.dept||"") + " " + (x.loc||"")).toLowerCase().indexOf(q) >= 0;
+    });
+  }
+
+  if (f.sort === "priceAsc") arr.sort(function(a,b){ return (a.price||0) - (b.price||0); });
+  else if (f.sort === "priceDesc") arr.sort(function(a,b){ return (b.price||0) - (a.price||0); });
+  else if (f.sort === "near") arr.sort(function(a,b){ return (a.locDist||0) - (b.locDist||0); });
+  else if (f.sort === "cond") arr.sort(function(a,b){ return condScore(b.cond) - condScore(a.cond); });
+  else arr.sort(function(a,b){ return (b.ts||0) - (a.ts||0); });
+
+  return arr;
+}
+
+/* ---------- 卡片 ---------- */
+function cardHtml(it){
+  var col = CATCOLOR[it.cat] || ["#eef4fb","#dde8f5"];
+  var saved = state.saved.indexOf(it.id) >= 0;
+  var isMine = !!it.mine;
+
+  return '<article onclick="openItem(\'' + esc(it.id) + '\')" style="cursor:pointer;background:#fff;border:1px solid #e6f0fb;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 8px rgba(20,60,120 .05);transition:transform .16s,box-shadow .16s;" ' +
+    'onmouseover="this.style.transform=\'translateY(-3px)\';this.style.boxShadow=\'0 12px 28px rgba(20,60,120 .12)\'" ' +
+    'onmouseout="this.style.transform=\'none\';this.style.boxShadow=\'0 2px 8px rgba(20,60,120 .05)\'">' +
+
+    '<div style="position:relative;height:118px;background:linear-gradient(135deg,' + col[0] + ',' + col[1] + ');display:grid;place-items:center;">' +
+      '<span style="font-size:44px;line-height:1;filter:saturate(1.05);">' + (EMOJI[it.cat] || "📦") + '</span>' +
+      '<span style="position:absolute;top:9px;left:9px;background:rgba(255,255,255 .9);color:#4a6484;font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px;">' + esc(it.cond) + '</span>' +
+      (isMine ? '<span style="position:absolute;top:9px;right:9px;background:#1e6fd9;color:#fff;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:8px;">我的</span>' : '') +
+    '</div>' +
+
+    '<div style="padding:11px 13px 0;flex:1;display:flex;flex-direction:column;">' +
+      '<div style="font-size:14px;font-weight:600;color:#16233a;line-height:1.45;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:40px;">' + esc(it.title) + '</div>' +
+      '<div style="font-size:12px;color:#98aabf;line-height:1.5;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:9px;">' + esc(it.desc || "卖家没有写描述") + '</div>' +
+      '<div style="margin-top:auto;display:flex;align-items:baseline;gap:7px;">' +
+        '<span style="font-size:19px;font-weight:800;color:#1e6fd9;letter-spacing:-.5px;">' + money(it.price) + '</span>' +
+        (it.orig && Number(it.orig) > Number(it.price) ? '<span style="font-size:11.5px;color:#bccbd9;text-decoration:line-through;">' + money(it.orig) + '</span>' : '') +
+      '</div>' +
+    '</div>' +
+
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 13px 12px;">' +
+      '<span style="font-size:11.5px;color:#a3b4c8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(it.loc || "校内") + ' · ' + timeAgo(it.ts) + '</span>' +
+      '<button onclick="event.stopPropagation();toggleSave(\'' + esc(it.id) + '\')" title="想要" ' +
+        'style="border:none;cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:8px;flex-shrink:0;' +
+        (saved ? 'background:#fff1e8;color:#e2683c;' : 'background:#f2f7fd;color:#8ba0b8;') + '">' +
+        (saved ? "★ 已想要" : "☆ 想要") +
+      '</button>' +
+    '</div>' +
+  '</article>';
+}
+
+function wantCardHtml(it){
+  var col = CATCOLOR[it.cat] || ["#eef4fb","#dde8f5"];
+  return '<article onclick="openItem(\'' + esc(it.id) + '\')" style="cursor:pointer;background:#fff;border:1px solid #f0e6dc;border-left:3px solid #f0854a;border-radius:14px;padding:15px 17px;box-shadow:0 2px 8px rgba(120,70,20 .05);" ' +
+    'onmouseover="this.style.boxShadow=\'0 10px 24px rgba(120,70,20 .12)\'" onmouseout="this.style.boxShadow=\'0 2px 8px rgba(120,70,20 .05)\'">' +
+    '<div style="display:flex;gap:12px;align-items:flex-start;">' +
+      '<div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,' + col[0] + ',' + col[1] + ');display:grid;place-items:center;font-size:22px;flex-shrink:0;">' + (EMOJI[it.cat] || "📦") + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:14.5px;font-weight:600;color:#16233a;line-height:1.45;margin-bottom:4px;">' + esc(it.title) + '</div>' +
+        '<div style="font-size:12.5px;color:#8ba0b8;line-height:1.6;">' + esc(it.desc) + '</div>' +
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;">' +
+          '<span style="font-size:12px;color:#e2683c;font-weight:700;background:#fff5ef;padding:2px 9px;border-radius:7px;">预算 ' + money(it.budget) + '</span>' +
+          '<span style="font-size:11.5px;color:#a3b4c8;">' + esc(it.loc) + ' · ' + esc(it.dept) + '</span>' +
+          '<span style="font-size:11.5px;color:#a3b4c8;">信用 ' + it.credit + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</article>';
+}
+
+/* ---------- 渲染 ---------- */
+function render(){
+  var grid = document.getElementById("grid");
+  var empty = document.getElementById("empty");
+  var line = document.getElementById("resultLine");
+  var fb = document.getElementById("filterBar");
+
+  // 统计
+  document.getElementById("statOn").textContent = state.items.length;
+  document.getElementById("statSaved").textContent = state.saved.length;
+  var w = 0;
+  for (var i=0;i<state.items.length;i++) w += (Number(state.items[i].seedWeight) || 0.8);
+  document.getElementById("statCarbon").textContent = (w * 1.6).toFixed(1);
+
+  if (state.tab === "sell") {
+    fb.style.display = "block";
+    var arr = visibleItems();
+    line.textContent = arr.length ? "共 " + arr.length + " 件在售" : "";
+    grid.style.gridTemplateColumns = "repeat(auto-fill,minmax(232px,1fr))";
+    grid.innerHTML = arr.map(cardHtml).join("");
+    empty.style.display = arr.length ? "none" : "block";
+    empty.querySelector("div:nth-child(2)").textContent = "这里空空的";
+    empty.querySelector("div:nth-child(3)").textContent = "换个关键词，或者自己发一条";
+  } else if (state.tab === "want") {
+    fb.style.display = "none";
+    var list = WANTS.slice();
+    if (state.filter.q) {
+      var q = state.filter.q.toLowerCase();
+      list = list.filter(function(x){ return (x.title + x.desc + x.cat).toLowerCase().indexOf(q) >= 0; });
+    }
+    line.textContent = "共 " + list.length + " 条求购";
+    grid.style.gridTemplateColumns = "repeat(auto-fill,minmax(300px,1fr))";
+    grid.innerHTML = list.map(wantCardHtml).join("");
+    empty.style.display = list.length ? "none" : "block";
+  } else {
+    fb.style.display = "none";
+    var mine = state.items.filter(function(x){ return x.mine; });
+    line.textContent = mine.length ? "共 " + mine.length + " 件我发布的" : "";
+    grid.style.gridTemplateColumns = "repeat(auto-fill,minmax(232px,1fr))";
+    grid.innerHTML = mine.map(cardHtml).join("");
+    empty.style.display = mine.length ? "none" : "block";
+    empty.querySelector("div:nth-child(2)").textContent = "还没发过东西";
+    empty.querySelector("div:nth-child(3)").textContent = "点右上角「＋ 发布闲置」，发一条试试";
+  }
+}
+
+/* ---------- 详情 ---------- */
+function openItem(id){
+  var it = null, isWant = false;
+  for (var i=0;i<state.items.length;i++) if (state.items[i].id === id) it = state.items[i];
+  if (!it) { for (var j=0;j<WANTS.length;j++) if (WANTS[j].id === id) { it = WANTS[j]; isWant = true; } }
+  if (!it) return;
+
+  var col = CATCOLOR[it.cat] || ["#eef4fb","#dde8f5"];
+  var saved = state.saved.indexOf(it.id) >= 0;
+
+  var html =
+    '<div style="position:relative;height:170px;background:linear-gradient(135deg,' + col[0] + ',' + col[1] + ');display:grid;place-items:center;">' +
+      '<span style="font-size:70px;line-height:1;filter:saturate(1.05);">' + (EMOJI[it.cat] || "📦") + '</span>' +
+      '<button onclick="closeModal()" style="position:absolute;top:12px;right:12px;border:none;background:rgba(255,255,255 .92);color:#7d90a8;width:32px;height:32px;border-radius:10px;cursor:pointer;font-size:17px;line-height:1;font-family:inherit;">×</button>' +
+      '<span style="position:absolute;bottom:12px;left:14px;background:rgba(255,255,255 .92);color:#4a6484;font-size:12px;font-weight:600;padding:3px 10px;border-radius:9px;">' + esc(it.cond || ("预算 " + money(it.budget))) + '</span>' +
+    '</div>' +
+    '<div style="padding:20px 22px 22px;">' +
+      '<div style="font-size:19px;font-weight:700;color:#0d2b52;line-height:1.4;margin-bottom:10px;">' + esc(it.title) + '</div>' +
+      '<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:16px;">' +
+        '<span style="font-size:26px;font-weight:800;color:#1e6fd9;letter-spacing:-1px;">' + (isWant ? money(it.budget) : money(it.price)) + '</span>' +
+        (it.orig && Number(it.orig) > Number(it.price) ? '<span style="font-size:13px;color:#bccbd9;text-decoration:line-through;">原价 ' + money(it.orig) + '</span><span style="font-size:12px;color:#37a06a;font-weight:600;">省 ' + Math.round((1 - it.price/it.orig)*100) + '%</span>' : '') +
+        (isWant ? '<span style="font-size:12px;color:#e2683c;">买家心理价</span>' : '') +
+      '</div>' +
+      '<div style="background:#f7fafd;border:1px solid #eaf2fb;border-radius:12px;padding:13px 15px;font-size:13.5px;color:#4a6484;line-height:1.75;margin-bottom:16px;">' +
+        esc(it.desc || "卖家没有填写描述。") +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;font-size:12.5px;">' +
+        row("品类", it.cat) + row("成色", it.cond || "—") +
+        row("自提点", it.loc || "校内") + row("院系", it.dept || "—") +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;background:#eef6ff;border-radius:12px;padding:12px 14px;margin-bottom:18px;">' +
+        '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4d97f2,#1a63cc);display:grid;place-items:center;color:#fff;font-size:14px;font-weight:700;flex-shrink:0;">' + esc((it.seller||"同").slice(0,1)) + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:13.5px;font-weight:600;color:#0d2b52;">' + esc(it.seller || "同学") + ' <span style="font-size:11px;color:#37a06a;background:#e7f8ef;padding:1px 6px;border-radius:6px;margin-left:4px;">学号已认证</span></div>' +
+          '<div style="font-size:11.5px;color:#8ba0b8;margin-top:2px;">信用 ' + (it.credit || "4.8") + ' · 历史成交 ' + (it.trade || 0) + ' 笔 · 履约正常</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:11.5px;color:#a3b4c8;line-height:1.7;margin-bottom:16px;border-left:2px solid #e3eefb;padding-left:10px;">' +
+        '交易请到约定自提点当面验货，确认无误再付款。本站不代收货款，不承担交易纠纷责任。' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;">' +
+        '<button onclick="toggleSave(\'' + esc(it.id) + '\');closeModal();" ' +
+          'style="flex:1;border:1px solid ' + (saved ? "#ffd8c2" : "#dbe9fa") + ';background:' + (saved ? "#fff5ef" : "#fff") + ';color:' + (saved ? "#e2683c" : "#5c7291") + ';font-family:inherit;font-size:14px;font-weight:600;padding:11px;border-radius:11px;cursor:pointer;">' +
+          (saved ? "★ 已加入想要" : "☆ 加入想要") +
+        '</button>' +
+        '<button onclick="contactSeller(\'' + esc(it.seller || "同学") + '\',\'' + esc(it.loc || "校内") + '\')" ' +
+          'style="flex:1.5;border:none;background:linear-gradient(135deg,#2f83ee,#1a63cc);color:#fff;font-family:inherit;font-size:14px;font-weight:600;padding:11px;border-radius:11px;cursor:pointer;box-shadow:0 4px 14px rgba(26,99,204 .28);">' +
+          (isWant ? "我有这个东西" : "联系卖家") +
+        '</button>' +
+      '</div>' +
+      (it.mine ? '<button onclick="delItem(\'' + esc(it.id) + '\')" style="width:100%;margin-top:10px;border:1px solid #f5dcdc;background:#fff;color:#d9605f;font-family:inherit;font-size:13px;font-weight:600;padding:9px;border-radius:11px;cursor:pointer;">下架这件商品</button>' : '') +
+    '</div>';
+
+  document.getElementById("modalBox").innerHTML = html;
+  document.getElementById("modal").style.display = "block";
+}
+
+function row(k, v){
+  return '<div style="background:#fff;border:1px solid #eef4fb;border-radius:10px;padding:9px 12px;">' +
+    '<div style="font-size:11px;color:#a3b4c8;margin-bottom:1px;">' + esc(k) + '</div>' +
+    '<div style="font-size:13px;font-weight:600;color:#16233a;">' + esc(v) + '</div></div>';
+}
+
+function closeModal(){ document.getElementById("modal").style.display = "none"; }
+
+function toggleSave(id){
+  var i = state.saved.indexOf(id);
+  if (i >= 0) { state.saved.splice(i,1); toast("已取消想要"); }
+  else { state.saved.push(id); toast("已加入想要，卖家会收到提醒"); }
+  saveSaved();
+  render();
+  if (document.getElementById("modal").style.display === "block") openItem(id);
+}
+
+function contactSeller(name, loc){
+  toast("已生成联系卡：到「" + loc + "」找 " + name);
+}
+
+function delItem(id){
+  state.items = state.items.filter(function(x){ return x.id !== id; });
+  saveAll(); closeModal(); render(); toast("已下架");
+}
+
+/* ---------- 发布 ---------- */
+function openPublish(){
+  // 初始化下拉
+  var pc = document.getElementById("pCat");
+  if (pc.options.length === 0) {
+    CATS.forEach(function(c){
+      var o = document.createElement("option");
+      o.value = c; o.textContent = EMOJI[c] + " " + c;
+      pc.appendChild(o);
+    });
+    var pd = document.getElementById("pCond");
+    CONDS.forEach(function(c){
+      var o = document.createElement("option");
+      o.value = c; o.textContent = c;
+      pd.appendChild(o);
+    });
+    var pl = document.getElementById("pLoc");
+    LOCS.forEach(function(c){
+      var o = document.createElement("option");
+      o.value = c; o.textContent = c;
+      pl.appendChild(o);
+    });
+  }
+  if (state.filter.cat) pc.value = state.filter.cat;
+  document.getElementById("pubModal").style.display = "block";
+}
+
+function closePublish(){ document.getElementById("pubModal").style.display = "none"; }
+
+function submitPublish(){
+  var title = document.getElementById("pTitle").value.trim();
+  var price = document.getElementById("pPrice").value.trim();
+  if (!title) { toast("标题还没写"); return; }
+  if (price === "" || isNaN(Number(price)) || Number(price) < 0) { toast("填一个有效价格"); return; }
+
+  var item = {
+    id: "m" + Date.now().toString(36) + Math.floor(Math.random()*900+100),
+    title: title,
+    cat: document.getElementById("pCat").value,
+    cond: document.getElementById("pCond").value,
+    price: Number(price),
+    orig: Number(document.getElementById("pOrig").value) || 0,
+    desc: document.getElementById("pDesc").value.trim(),
+    loc: document.getElementById("pLoc").value,
+    dept: document.getElementById("pDept").value.trim() || "本校学生",
+    seller: "我",
+    credit: 5.0,
+    trade: 0,
+    ts: Date.now(),
+    mine: true,
+    seedWeight: 0.8
+  };
+
+  state.items.unshift(item);
+  saveAll();
+  closePublish();
+
+  document.getElementById("pTitle").value = "";
+  document.getElementById("pPrice").value = "";
+  document.getElementById("pOrig").value = "";
+  document.getElementById("pDesc").value = "";
+
+  state.filter.cat = ""; state.filter.cond = ""; state.filter.q = "";
+  document.getElementById("q").value = "";
+  document.getElementById("qClear").style.display = "none";
+  renderChips();
+  if (state.tab !== "mine") setTab("sell"); else render();
+  toast("发布成功，同校同学已经能看到了");
+
+  window.scrollTo({top: 240, behavior: "smooth"});
+}
+
+/* ---------- 启动 ---------- */
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape") { closeModal(); closePublish(); }
+});
+
+loadAll();
+renderChips();
+render();
+</script>
+</body>
+</html>
